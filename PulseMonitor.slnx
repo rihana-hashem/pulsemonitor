@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PulseMonitor.Api/PulseMonitor.Api.csproj" />
+    <Project Path="src/PulseMonitor.Application/PulseMonitor.Application.csproj" />
+    <Project Path="src/PulseMonitor.Domain/PulseMonitor.Domain.csproj" />
+    <Project Path="src/PulseMonitor.Infrastructure/PulseMonitor.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/database/">
+    <File Path="001_CreateSchema.sql" />
+    <File Path="002_SeedData.sql" />
+    <File Path="003_ServerSoftDelete.sql" />
+    <File Path="004_Auth.sql" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PulseMonitor.IntegrationTests/PulseMonitor.IntegrationTests.csproj" />
+    <Project Path="tests/PulseMonitor.UnitTests/PulseMonitor.UnitTests.csproj" />
+  </Folder>
+</Solution>

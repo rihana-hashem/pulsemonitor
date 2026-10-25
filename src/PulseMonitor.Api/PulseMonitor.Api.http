@@ -1,0 +1,36 @@
+@PulseMonitor.Api_HostAddress = http://localhost:5184
+
+GET {{PulseMonitor.Api_HostAddress}}/api/v1/servers
+Accept: application/json
+
+###
+
+POST {{PulseMonitor.Api_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "userName": "jane.doe",
+  "email": "jane@example.com",
+  "password": "change-me-123"
+}
+
+###
+
+# The bootstrap admin password is in user-secrets: dotnet user-secrets list
+POST {{PulseMonitor.Api_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "userNameOrEmail": "jane.doe",
+  "password": "change-me-123"
+}
+
+###
+
+GET {{PulseMonitor.Api_HostAddress}}/health/live
+
+###
+
+GET {{PulseMonitor.Api_HostAddress}}/health/ready
+
+###

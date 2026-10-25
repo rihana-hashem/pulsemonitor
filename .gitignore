@@ -1,0 +1,19 @@
+# .NET build output and local IDE files
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.Backup.tmp
+
+# Logs (contain request data)
+logs/
+*.log
+
+# Frontend (frontend/.gitignore covers more)
+node_modules/
+frontend/dist/
+*.local
+
+# Assessment documents: not ours to publish
+docs/*.pdf

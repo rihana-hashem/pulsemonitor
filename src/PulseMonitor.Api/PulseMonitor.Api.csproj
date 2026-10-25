@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>a97440c5-c015-4597-aaa8-81711a262f84</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FastEndpoints" Version="8.3.0" />
+    <PackageReference Include="FastEndpoints.Swagger" Version="8.3.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.25" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PulseMonitor.Application\PulseMonitor.Application.csproj" />
+    <ProjectReference Include="..\PulseMonitor.Infrastructure\PulseMonitor.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
