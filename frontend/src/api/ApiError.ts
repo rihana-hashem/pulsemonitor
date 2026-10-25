@@ -63,6 +63,18 @@ function toFieldErrors(errors: ProblemDetails['errors']): Record<string, string[
   return errors
 }
 
+/** The response body as ProblemDetails; text responses (responseType: 'text') are parsed first. */
+function toProblemDetails(data: unknown): ProblemDetails {
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data)
+    } catch {
+      return {}
+    }
+  }
+  return typeof data === 'object' && data !== null ? data : {}
+}
+
 /** Converts whatever axios threw into an ApiError. */
 export function toApiError(error: unknown): ApiError {
   if (isApiError(error)) return error
@@ -79,7 +91,7 @@ export function toApiError(error: unknown): ApiError {
 
     const { status, data } = error.response
     // A proxy or gateway may answer with HTML or plain text instead of ProblemDetails.
-    const problem: ProblemDetails = typeof data === 'object' && data !== null ? data : {}
+    const problem = toProblemDetails(data)
 
     // 502/503/504 without a ProblemDetails body come from a proxy: the API itself is down.
     const gatewayError = !problem.title && (status === 502 || status === 503 || status === 504)

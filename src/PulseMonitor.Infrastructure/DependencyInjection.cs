@@ -10,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using PulseMonitor.Application.Alerts;
 using PulseMonitor.Application.Auth;
+using PulseMonitor.Application.Common.Interfaces;
+using PulseMonitor.Application.Reports;
+using PulseMonitor.Infrastructure.Reports;
 using PulseMonitor.Application.Dashboard;
 using PulseMonitor.Application.Metrics;
 using PulseMonitor.Application.Monitoring;
@@ -80,8 +83,25 @@ public static class DependencyInjection
         services.AddSingleton<IServerMonitoringExecutor,ScopedServerMonitoringExecutor>();
 
         services.AddAuth(configuration);
+        services.AddReports(configuration);
 
         return services;
+    }
+
+    private static void AddReports(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddOptions<ReportOptions>()
+            .Bind(configuration.GetSection(ReportOptions.SectionName))
+            .Validate(o => !string.IsNullOrWhiteSpace(o.StoragePath), "Reports:StoragePath is required.")
+            .Validate(o => o.RetentionDays is >= 1 and <= 90, "Reports:RetentionDays must be 1-90.")
+            .ValidateOnStart();
+
+        services.AddSingleton<IReportStorage, FileSystemReportStorage>();
+        services.AddSingleton<IEmailSender, LogEmailSender>();
+        services.AddScoped<ReportContentBuilder>();
+        services.AddScoped<IReportService, ReportService>();
     }
 
     private static void AddAuth(

@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar'
 import { useState } from 'react'
 import { Outlet } from 'react-router'
 import { useAlertNotifications } from '../../features/realtime/useAlertNotifications'
+import { useReportUpdates } from '../../features/reports/useReportUpdates'
 import { AppHeader } from './AppHeader'
 import { SideNav } from './SideNav'
 
@@ -16,8 +17,9 @@ const drawerWidth = 240
  */
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  // Alert notifications on every signed-in page.
+  // Alert and report notifications on every signed-in page.
   useAlertNotifications()
+  useReportUpdates()
   const closeMobile = () => setMobileOpen(false)
 
   return (

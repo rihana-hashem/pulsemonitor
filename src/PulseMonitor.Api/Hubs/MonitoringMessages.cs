@@ -1,4 +1,5 @@
 using PulseMonitor.Application.Metrics;
+using PulseMonitor.Application.Reports;
 
 namespace PulseMonitor.Api.Hubs;
 
@@ -43,4 +44,7 @@ public interface IMonitoringClient
     Task AlertChanged(AlertNotification alert);
 
     Task PresenceChanged(IReadOnlyList<OnlineUser> users);
+
+    /// <summary>Sent only to the user who requested the report.</summary>
+    Task ReportStatusChanged(ReportDto report);
 }

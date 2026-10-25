@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PulseMonitor.Domain.Exceptions;
@@ -41,7 +42,7 @@ public sealed class GlobalExceptionHandler(
 
         httpContext.Response.StatusCode = statusCode;
 
-        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        var context = new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = exception,
@@ -54,6 +55,20 @@ public sealed class GlobalExceptionHandler(
                     ? null
                     : exception.Message
             }
-        });
+        };
+
+        if (await problemDetailsService.TryWriteAsync(context))
+            return true;
+
+        // The writer declines when the client does not accept JSON (e.g. a file download sent
+        // with Accept: text/html). Answer with ProblemDetails anyway rather than leaving the
+        // response unhandled, which would turn it into a 500.
+        context.ProblemDetails.Extensions["traceId"] = Activity.Current?.Id ?? httpContext.TraceIdentifier;
+        await httpContext.Response.WriteAsJsonAsync(
+            context.ProblemDetails,
+            options: null,
+            contentType: "application/problem+json",
+            cancellationToken: cancellationToken);
+        return true;
     }
 }

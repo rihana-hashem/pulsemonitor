@@ -1,4 +1,5 @@
 import type { LatestMetrics } from '../metrics/types'
+import type { Report } from '../reports/types'
 
 /** Client events of the API's MonitoringHub (see Hubs/MonitoringMessages.cs). */
 export type HubEvents = {
@@ -6,6 +7,8 @@ export type HubEvents = {
   DashboardMetricsUpdated: ServerMetricsSummary
   AlertChanged: AlertNotification
   PresenceChanged: OnlineUser[]
+  /** Sent only to the user who requested the report. */
+  ReportStatusChanged: Report
 }
 
 export type ServerMetricsUpdate = {

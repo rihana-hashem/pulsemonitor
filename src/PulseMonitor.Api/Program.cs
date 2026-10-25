@@ -11,6 +11,7 @@ using PulseMonitor.Api.Auth;
 using PulseMonitor.Api.HealthChecks;
 using PulseMonitor.Api.Hubs;
 using PulseMonitor.Application.Monitoring;
+using PulseMonitor.Application.Reports;
 using Microsoft.AspNetCore.SignalR;
 using PulseMonitor.Api.Middleware;
 using PulseMonitor.Infrastructure.HealthChecks;
@@ -43,6 +44,7 @@ try
     builder.Services.AddSingleton<IUserIdProvider, SubjectUserIdProvider>();
     builder.Services.AddSingleton<PresenceTracker>();
     builder.Services.AddSingleton<IMonitoringNotifier, SignalRMonitoringNotifier>();
+    builder.Services.AddSingleton<IReportNotifier, SignalRReportNotifier>();
     builder.Services.AddHangfireServer(options =>
     {
         options.WorkerCount = 2;

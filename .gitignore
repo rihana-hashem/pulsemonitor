@@ -17,3 +17,6 @@ frontend/dist/
 
 # Assessment documents: not ours to publish
 docs/*.pdf
+
+# Generated report files
+App_Data/
