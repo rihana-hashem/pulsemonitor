@@ -20,3 +20,6 @@ docs/*.pdf
 
 # Generated report files
 App_Data/
+
+# Local Docker Compose credentials
+/.env

@@ -1,0 +1,13 @@
+**/bin
+**/obj
+**/.vs
+**/.git
+**/*.user
+**/*.suo
+**/.env*
+**/secrets.json
+**/App_Data
+**/logs
+**/*.log
+**/*.pfx
+**/*.pem

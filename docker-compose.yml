@@ -1,0 +1,63 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:?Set a strong SA_PASSWORD in .env}"
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+      - ./docker/init-db.sh:/init/init-db.sh:ro
+      - ./001_CreateSchema.sql:/init/001_CreateSchema.sql:ro
+      - ./002_SeedData.sql:/init/002_SeedData.sql:ro
+      - ./003_ServerSoftDelete.sql:/init/003_ServerSoftDelete.sql:ro
+      - ./004_Auth.sql:/init/004_Auth.sql:ro
+    entrypoint: ["/bin/bash", "/init/init-db.sh"]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          test -f /var/opt/mssql/.pulsemonitor-initialized &&
+          SQLCMDPASSWORD="$$MSSQL_SA_PASSWORD" /opt/mssql-tools18/bin/sqlcmd
+          -S localhost -U sa -C -b -l 3 -d PulseMonitorDb -Q "SELECT 1" >/dev/null
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+    networks: [pulsemonitor]
+
+  backend:
+    build: ./src
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__PulseMonitorDb: >-
+        Server=db,1433;Database=PulseMonitorDb;User ID=sa;Password="${SA_PASSWORD}";
+        Encrypt=True;TrustServerCertificate=True
+      Jwt__SigningKey: "${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}"
+      AdminBootstrap__Password: "${ADMIN_BOOTSTRAP_PASSWORD:?Set ADMIN_BOOTSTRAP_PASSWORD in .env}"
+    ports:
+      - "127.0.0.1:5184:8080"
+    volumes:
+      - reports:/app/App_Data/reports
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [pulsemonitor]
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:3000:80"
+    depends_on:
+      - backend
+    networks: [pulsemonitor]
+
+volumes:
+  sql-data:
+  reports:
+
+networks:
+  pulsemonitor:
+    driver: bridge

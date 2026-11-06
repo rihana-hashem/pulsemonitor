@@ -6,8 +6,8 @@ performance reports on demand, and pushes all of it live to the browser.
 
 Built for the GamaLearn Senior Full Stack technical assessment with .NET 10 and React + TypeScript.
 
-> See [ARCHITECTURE.md](ARCHITECTURE.md) for the design and [DEPLOYMENT.md](DEPLOYMENT.md) for
-> running it outside a developer machine.
+> See [ARCHITECTURE.md](ARCHITECTURE.md) for the design and [Running with Docker](#running-with-docker)
+> to start the full stack in containers.
 
 ## Features
 
@@ -36,6 +36,7 @@ Built for the GamaLearn Senior Full Stack technical assessment with .NET 10 and 
 | Logging and health | Serilog (console and JSON files), ASP.NET Core health checks |
 | Frontend | React 19, TypeScript, Vite, Material UI 9, MUI X Charts, React Router 8, TanStack Query 5, axios, react-hook-form + zod, @microsoft/signalr |
 | Tests | xUnit |
+| Containers | Docker Compose, SQL Server 2022 Developer, Nginx Alpine for the React bundle and reverse proxy |
 
 ## Architecture
 
@@ -163,9 +164,32 @@ so no CORS setup is needed in development.
 
 ### Running with Docker
 
-Docker files are not included yet (see [Known limitations](#known-limitations-and-future-improvements)).
-[DEPLOYMENT.md](DEPLOYMENT.md) describes how the API and frontend are built and configured for a
-server or container environment.
+Install Docker with Compose and a running Linux container engine. From the repository root, create
+a local `.env` file using the following keys. Replace each placeholder with a unique secret.
+Use at least 16 characters for `SA_PASSWORD`, with uppercase letters, lowercase letters, and
+digits. Use only those characters to keep the value safe for both Compose and the SQL connection
+string. The JWT key needs at least 32 bytes and the admin password at least 12 characters.
+
+```dotenv
+SA_PASSWORD=<strong SQL Server password>
+JWT_SIGNING_KEY=<random JWT signing key>
+ADMIN_BOOTSTRAP_PASSWORD=<initial admin password>
+```
+
+```sh
+docker compose up --build -d
+docker compose ps
+```
+
+Open `http://localhost:3000` and sign in as `admin` with the bootstrap password. Use the
+`localhost` address for browser sign-in so the browser can accept the secure refresh cookie.
+Nginx serves the React app and forwards API, health, and SignalR requests on the same origin.
+Check `http://localhost:3000/health/ready` once startup finishes. The API and SQL Server are also
+available directly on localhost ports 5184 and 1433.
+
+SQL Server applies the numbered scripts on first startup, and the API waits for the initialized
+database. If startup stalls, inspect `docker compose logs db backend`. Use `docker compose down`
+to stop the stack. The named volumes preserve SQL data and generated reports across restarts.
 
 ## Testing
 
@@ -235,8 +259,7 @@ Errors use ProblemDetails (RFC 7807) with field-level validation messages.
 - **Background jobs page and user management page** in the frontend are placeholders. Jobs are
   monitored and retried in the Hangfire dashboard, which is only enabled in development; production
   needs an authorization filter on it.
-- **Docker and CI/CD** are not set up yet: Dockerfiles for the API and frontend, a
-  `docker-compose.yml` with SQL Server, and a GitHub Actions workflow for build and test.
+- **CI/CD** is pending a GitHub Actions workflow for build and test.
 - **Test coverage** is limited: unit tests cover the alert policy and metric bucketing, and two
   database integration tests cover alert evaluation and metric writes. Still missing:
   `WebApplicationFactory` API tests, application-service unit tests with mocks, and frontend
